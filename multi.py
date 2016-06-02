@@ -4,6 +4,7 @@
 """ Reading file with main thread """
 
 import os
+import sys
 import Queue
 import random
 import argparse
@@ -17,21 +18,9 @@ def _dummy():
     with open('alice.txt', 'a') as dst_file:
         dst_file.write(random.choice(variations) + '\n')
 
-
-lock = multiprocessing.Lock()
-
-
-def worker():
-    """ Worker thread to filter data """ 
-    with lock:
-        for _ in range(10):
-            sys.stderr.write(i)
-            time.sleep(1)
-
-
 def main():
     parser = argparse.ArgumentParser(description='Producers/consumers')
-    parser.add_argument('--threads', help='Number of threads', default=2, type=int)
+    parser.add_argument('--threads', help='Number of threads', default=4, type=int)
     parser.add_argument('--source', help='File to read', default='alice.txt', type=str)
     parser.add_argument('--target', help='File to read', default='output.txt', type=str)
     args = parser.parse_args()
@@ -44,14 +33,29 @@ def main():
         source_file_path = args.source
 
     queue = Queue.Queue()
-    for i in range(args.threads):
-        print i
-        
+
+    lock = multiprocessing.Lock()
+
+    def worker():
+        """ Worker thread to filter data """
+        while True:
+            item = queue.get()
+            with lock:
+                if item.isupper():
+                    sys.stderr.write(item + '\n')
+                    with open(args.target, 'a') as dst_file:
+                        dst_file.write(item)
+            queue.task_done()
+
+    for idx in range(args.threads):
+        print idx, 'spawning'
+        thread = threading.Thread(target=worker)
+        thread.daemon = True
+        thread.start()
     with file(source_file_path, 'r') as source_file:
         for line in source_file:
-            print line
-        
-
+            queue.put(line)
+    queue.join()
 
 if __name__ == "__main__":
     main()
