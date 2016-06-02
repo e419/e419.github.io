@@ -6,6 +6,7 @@
 import os
 import sys
 import Queue
+import string
 import random
 import argparse
 import threading
@@ -18,6 +19,12 @@ def _dummy():
     with open('alice.txt', 'a') as dst_file:
         dst_file.write(random.choice(variations) + '\n')
 
+def _generate_debuggable():
+    out = [z[0].capitalize() if z[1] == True else z[0] for z in zip(string.ascii_lowercase, [x % 2 for  x in range(1, 26)])]
+    with open('alice.txt', 'a') as dst_file:
+        for item in out:
+            dst_file.write(str(item) + '\n')
+    
 def main():
     parser = argparse.ArgumentParser(description='Producers/consumers')
     parser.add_argument('--threads', help='Number of threads', default=4, type=int)
