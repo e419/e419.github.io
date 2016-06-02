@@ -5,15 +5,24 @@
 
 import os
 import Queue
+import random
 import argparse
 import threading
 import multiprocessing
+
+
+def _dummy():
+    """ Generate sample file """
+    variations = ['A', 'b', ' ']
+    with open('alice.txt', 'a') as dst_file:
+        dst_file.write(random.choice(variations) + '\n')
 
 
 lock = multiprocessing.Lock()
 
 
 def worker():
+    """ Worker thread to filter data """ 
     with lock:
         for _ in range(10):
             sys.stderr.write(i)
@@ -33,6 +42,11 @@ def main():
             exit()
     else:
         source_file_path = args.source
+
+    queue = Queue.Queue()
+    for i in range(args.threads):
+        print i
+        
     with file(source_file_path, 'r') as source_file:
         for line in source_file:
             print line
