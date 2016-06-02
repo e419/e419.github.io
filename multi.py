@@ -42,13 +42,11 @@ def main():
             item = queue.get()
             with lock:
                 if item.isupper():
-                    sys.stderr.write(item + '\n')
                     with open(args.target, 'a') as dst_file:
                         dst_file.write(item)
             queue.task_done()
 
     for idx in range(args.threads):
-        print idx, 'spawning'
         thread = threading.Thread(target=worker)
         thread.daemon = True
         thread.start()
