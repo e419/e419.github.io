@@ -10,6 +10,7 @@ import xmltodict
 from xml.etree import ElementTree
 from pprint import pprint as _pprint
 from requests.auth import HTTPBasicAuth
+from pprint import pprint as _pprint
 
 LOGIN_URL = 'https://python-for-qa.herokuapp.com/login'
 DATA_URL = 'https://python-for-qa.herokuapp.com/data'
@@ -38,11 +39,12 @@ def main():
     else:
         with open(XML_FILE, 'rt') as xml_file:
             data = xml_file.read()
-            xml_data  = xmltodict.parse(data)
+            xml_data  = dict(xmltodict.parse(data))
         json_data = json.loads(open(JSON_FILE, 'r').read())
-        for item in json_data:
-            print item['_id']
-            raw_input()
+        #print len(json_data)
+        for thing  in xml_data.get('items'):
+            print thing
+
 
 if __name__ == "__main__":
     main()
