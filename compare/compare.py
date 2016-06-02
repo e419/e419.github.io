@@ -6,6 +6,7 @@
 import os
 import json
 import requests
+import xmltodict
 from xml.etree import ElementTree
 from pprint import pprint as _pprint
 from requests.auth import HTTPBasicAuth
@@ -36,14 +37,12 @@ def main():
         load_data()
     else:
         with open(XML_FILE, 'rt') as xml_file:
-            tree = ElementTree.parse(xml_file)
-        xml_data = tree.findall('.//item')
-        for item in xml_data:
-            print item.getchildren()
-        # json_data = json.loads(open(JSON_FILE, 'r').read())
-        # for item in json_data:
-        #     print item['_id']
-        #     raw_input()
+            data = xml_file.read()
+            xml_data  = xmltodict.parse(data)
+        json_data = json.loads(open(JSON_FILE, 'r').read())
+        for item in json_data:
+            print item['_id']
+            raw_input()
 
 if __name__ == "__main__":
     main()
