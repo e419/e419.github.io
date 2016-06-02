@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-
 """ JSON and XML compare """
 
 import os
 import json
 import requests
+from xml.etree import ElementTree
 from pprint import pprint as _pprint
 from requests.auth import HTTPBasicAuth
-
 
 LOGIN_URL = 'https://python-for-qa.herokuapp.com/login'
 DATA_URL = 'https://python-for-qa.herokuapp.com/data'
@@ -30,18 +29,21 @@ def load_data():
     auth_headers['Accept'] = 'application/xml'
     xml_data_response = requests.get(DATA_URL, headers=auth_headers)
     with open(XML_FILE, 'a') as xml_file:
-        xml_file.write(xml_data_response.content)    
-
+        xml_file.write(xml_data_response.content)
 
 def main():
     if not os.path.exists(JSON_FILE) or not os.path.exists(XML_FILE):
         load_data()
     else:
-        json_data = json.loads(open(JSON_FILE, 'r').read())
-        for item in json_data:
-            _pprint(item)
-            raw_input()
-
+        with open(XML_FILE, 'rt') as xml_file:
+            tree = ElementTree.parse(xml_file)
+        xml_data = tree.findall('.//item')
+        for item in xml_data:
+            print item.getchildren()
+        # json_data = json.loads(open(JSON_FILE, 'r').read())
+        # for item in json_data:
+        #     print item['_id']
+        #     raw_input()
 
 if __name__ == "__main__":
     main()
